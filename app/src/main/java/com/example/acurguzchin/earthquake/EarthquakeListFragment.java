@@ -78,7 +78,12 @@ public class EarthquakeListFragment extends ListFragment {
                         Element geo = (Element) entry.getElementsByTagName("georss:point").item(0);
                         Element when = (Element) entry.getElementsByTagName("updated").item(0);
                         Element link = (Element) entry.getElementsByTagName("link").item(0);
+
                         String details = title.getFirstChild().getNodeValue();
+                        if (details.equals("Data Feed Deprecated")) {
+                            continue;
+                        }
+
                         String hostname = "http://earthquake.usgs.gov";
                         String absLinkString = hostname + link.getAttribute("href");
                         String point = geo.getFirstChild().getNodeValue();

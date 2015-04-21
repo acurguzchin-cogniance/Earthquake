@@ -27,7 +27,7 @@ public class Quake {
         return date;
     }
 
-    public String getDetals() {
+    public String getDetails() {
         return detals;
     }
 

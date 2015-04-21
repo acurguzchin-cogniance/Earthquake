@@ -1,6 +1,9 @@
 package com.example.acurguzchin.earthquake;
 
 import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,10 +11,10 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 public class EarthquakeActivity extends ActionBarActivity {
     static final private int MENU_PREFERENCES = Menu.FIRST + 1;
-    static final private int MENU_UPDATE = Menu.FIRST + 2;
     private static final int SHOW_PREFERENCES = 1;
 
     public int minimumMagnitude = 0;
@@ -23,6 +26,11 @@ public class EarthquakeActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         updateFromPreferences();
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+        SearchView searchView = (SearchView) findViewById(R.id.searchView);
+        searchView.setSearchableInfo(searchableInfo);
     }
 
     @Override

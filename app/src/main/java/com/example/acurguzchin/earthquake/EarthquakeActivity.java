@@ -27,10 +27,10 @@ public class EarthquakeActivity extends ActionBarActivity {
         setContentView(R.layout.main);
         updateFromPreferences();
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
-        SearchView searchView = (SearchView) findViewById(R.id.searchView);
-        searchView.setSearchableInfo(searchableInfo);
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+//        SearchView searchView = (SearchView) findViewById(R.id.searchView);
+//        searchView.setSearchableInfo(searchableInfo);
     }
 
     @Override

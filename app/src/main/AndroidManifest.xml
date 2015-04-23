@@ -41,6 +41,8 @@
         <provider
             android:authorities="com.example.acurguzchin.earthquake"
             android:name=".EarthquakeProvider" />
+
+        <service android:name=".EarthquakeUpdateService" android:enabled="true" />
     </application>
 
 </manifest>

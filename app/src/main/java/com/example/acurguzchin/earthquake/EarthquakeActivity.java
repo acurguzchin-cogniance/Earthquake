@@ -58,13 +58,8 @@ public class EarthquakeActivity extends ActionBarActivity {
             updateFromPreferences();
 
             FragmentManager fm = getFragmentManager();
-            final EarthquakeListFragment earthquakeList = (EarthquakeListFragment) fm.findFragmentById(R.id.EarthquakeListFragment);
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    earthquakeList.refreshEarthquakes();
-                }
-            });
-            t.start();
+            EarthquakeListFragment earthquakeList = (EarthquakeListFragment) fm.findFragmentById(R.id.EarthquakeListFragment);
+            earthquakeList.refreshEarthquakes();
         }
     }
 

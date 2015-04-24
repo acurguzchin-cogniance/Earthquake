@@ -1,13 +1,17 @@
 package com.example.acurguzchin.earthquake;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -26,8 +30,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,12 +40,15 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class EarthquakeUpdateService extends Service {
     public static String TAG = "EARTHQUAKE_UPDATE_SERVICE";
-    private Timer updateTimer;
+    private AlarmManager alarmManager;
+    private PendingIntent alarmIntent;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        updateTimer = new Timer("earthquakeUpdates");
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intentToFire = new Intent(EarthquakeAlarmReceiver.ACTION_REFRESH_EARTHQUAKE_ALARM);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
     }
 
     @Override
@@ -52,27 +57,24 @@ public class EarthquakeUpdateService extends Service {
         int updateFreq = Integer.parseInt(prefs.getString(UserPreferenceActivity.PREF_UPDATE_FREQ, "60"));
         boolean autoUpdateChecked = prefs.getBoolean(UserPreferenceActivity.PREF_AUTO_UPDATE, false);
 
-        updateTimer.cancel();
         if (autoUpdateChecked) {
-            updateTimer = new Timer("earthquakeUpdates");
-            updateTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    refreshEarthquakes();
-                }
-            }, 0, updateFreq * 60 * 1000);
+            long refreshPeriod = updateFreq * 60 * 1000;
+            long timeToRefresh = SystemClock.elapsedRealtime() + refreshPeriod;
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToRefresh, refreshPeriod, alarmIntent);
         }
         else {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    refreshEarthquakes();
-                }
-            });
-            thread.start();
+            alarmManager.cancel(alarmIntent);
         }
 
-        return Service.START_STICKY;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                refreshEarthquakes();
+            }
+        });
+        thread.start();
+
+        return Service.START_NOT_STICKY;
     }
 
     @Override
@@ -146,6 +148,7 @@ public class EarthquakeUpdateService extends Service {
             Log.d(TAG, "SAX Exception");
         }
         finally {
+            stopSelf();
         }
     }
 

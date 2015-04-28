@@ -1,19 +1,15 @@
 package com.example.acurguzchin.earthquake;
 
+import android.app.Activity;
 import android.app.FragmentManager;
-import android.app.SearchManager;
-import android.app.SearchableInfo;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SearchView;
 
-public class EarthquakeActivity extends ActionBarActivity {
+public class EarthquakeActivity extends Activity {
     static final private int MENU_PREFERENCES = Menu.FIRST + 1;
     private static final int SHOW_PREFERENCES = 1;
 

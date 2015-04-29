@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 public class EarthquakeActivity extends Activity {
-    static final private int MENU_PREFERENCES = Menu.FIRST + 1;
     private static final int SHOW_PREFERENCES = 1;
     private static String ACTION_BAR_INDEX = "ACTION_BAR_INDEX";
 
@@ -61,19 +60,24 @@ public class EarthquakeActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, MENU_PREFERENCES, Menu.NONE, R.string.menu_preferences);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-        if (item.getItemId() == MENU_PREFERENCES) {
-            Intent intent = new Intent(this, UserPreferenceActivity.class);
-            startActivityForResult(intent, SHOW_PREFERENCES);
-            return true;
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                startService(new Intent(this, EarthquakeUpdateService.class));
+                return true;
+            case R.id.menu_preferences:
+                Intent intent = new Intent(this, UserPreferenceActivity.class);
+                startActivityForResult(intent, SHOW_PREFERENCES);
+                return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     @Override

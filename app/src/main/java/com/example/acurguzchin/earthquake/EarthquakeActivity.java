@@ -28,7 +28,7 @@ public class EarthquakeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        updateFromPreferences();
+        fetchPreferences();
 
         if (!isTabletLayout()) {
             ActionBar actionBar = getActionBar();
@@ -69,7 +69,7 @@ public class EarthquakeActivity extends Activity {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                startService(new Intent(this, EarthquakeUpdateService.class));
+                restartRefreshService();
                 return true;
             case R.id.menu_preferences:
                 Intent intent = new Intent(this, UserPreferenceActivity.class);
@@ -84,16 +84,20 @@ public class EarthquakeActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SHOW_PREFERENCES) {
-            updateFromPreferences();
-            startService(new Intent(this, EarthquakeUpdateService.class));
+            fetchPreferences();
+            restartRefreshService();
         }
     }
 
-    private void updateFromPreferences() {
+    private void fetchPreferences() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         minimumMagnitude = Integer.parseInt(prefs.getString(UserPreferenceActivity.PREF_MIN_MAG, "0"));
         updateFreq = Integer.parseInt(prefs.getString(UserPreferenceActivity.PREF_UPDATE_FREQ, "60"));
         autoUpdateChecked = prefs.getBoolean(UserPreferenceActivity.PREF_AUTO_UPDATE, false);
+    }
+
+    private void restartRefreshService() {
+        startService(new Intent(this, EarthquakeUpdateService.class));
     }
 
     @Override

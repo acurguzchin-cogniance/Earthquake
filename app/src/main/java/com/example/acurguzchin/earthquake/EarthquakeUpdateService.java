@@ -11,10 +11,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -149,7 +151,15 @@ public class EarthquakeUpdateService extends IntentService {
             Log.d(TAG, "SAX Exception");
         }
         finally {
-
+            final Context context = getApplicationContext();
+            Handler handler = new Handler(context.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast toast = Toast.makeText(context, "Earthquakes are up-to-date", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            });
         }
     }
 

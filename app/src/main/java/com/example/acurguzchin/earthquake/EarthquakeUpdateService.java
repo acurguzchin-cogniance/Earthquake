@@ -2,8 +2,9 @@ package com.example.acurguzchin.earthquake;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -43,8 +44,12 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class EarthquakeUpdateService extends IntentService {
     public static String TAG = "EARTHQUAKE_UPDATE_SERVICE";
+
+    private static final int NOTIFICATION_ID = 1;
+
     private AlarmManager alarmManager;
     private PendingIntent alarmIntent;
+    private Notification.Builder notifBuilder;
 
     public EarthquakeUpdateService() {
         super("EarthquakeUpdateService");
@@ -75,9 +80,13 @@ public class EarthquakeUpdateService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
+
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intentToFire = new Intent(EarthquakeAlarmReceiver.ACTION_REFRESH_EARTHQUAKE_ALARM);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
+
+        notifBuilder = new Notification.Builder(this);
+        notifBuilder.setAutoCancel(true).setTicker("Earthquake detected").setSmallIcon(R.drawable.notification_icon);
     }
 
     @Override
@@ -182,7 +191,25 @@ public class EarthquakeUpdateService extends IntentService {
             values.put(EarthquakeProvider.KEY_MAGNITUDE, quake.getMagnitude());
 
             contentResolver.insert(EarthquakeProvider.CONTENT_URI, values);
+
+
         }
+        broadcastNotification(quake);
         cursor.close();
+    }
+
+    private void broadcastNotification(Quake quake) {
+        Intent startActivityIntent = new Intent(this, EarthquakeActivity.class);
+        PendingIntent launchIntent = PendingIntent.getActivity(this, 0, startActivityIntent, 0);
+
+        notifBuilder.setContentIntent(launchIntent).
+                setWhen(quake.getDate().getTime()).
+                setContentTitle("M: " + quake.getMagnitude()).
+                setContentText(quake.getDetails());
+
+        Log.i(TAG, quake.getDetails());
+
+        NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notifManager.notify(NOTIFICATION_ID, notifBuilder.getNotification());
     }
 }
